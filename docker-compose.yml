@@ -1,19 +1,18 @@
-version: "3.8"
-
 services:
   postgres:
     image: postgres:15-alpine
     container_name: codeconnect-postgres
+    restart: always
     ports:
-      - "5432:5432"
+      - "5434:5432" # host 5434 -> container 5432 (avoids conflict)
     environment:
-      POSTGRES_DB: codeconnect
-      POSTGRES_USER: dev
-      POSTGRES_PASSWORD: dev123
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=123
+      - POSTGRES_DB=codeconn_dev
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U dev"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d codeconn_dev"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -21,13 +20,9 @@ services:
   redis:
     image: redis:7-alpine
     container_name: codeconnect-redis
+    restart: always
     ports:
       - "6379:6379"
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
 volumes:
   postgres_data:
